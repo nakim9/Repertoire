@@ -1,4 +1,4 @@
 /* Affiche le contenu du repertoire */
-void affichePersonnes(PERSONNE * p);
+void affichePersonnes(NOEUD * p);
 /*Affiche une personne*/
 void affichePersonne(PERSONNE * p);

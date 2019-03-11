@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 #include "struct.h"
+#include "listio.h"
+#include "vue.h"
 
-PERSONNE * ajoutPersonne(PERSONNE * tete, PERSONNE * p){
+NOEUD * ajoutPersonne(NOEUD * tete, NOEUD * p){
   if(p == NULL){
     p = tete;
   }
@@ -13,33 +15,38 @@ PERSONNE * ajoutPersonne(PERSONNE * tete, PERSONNE * p){
     p->suiv = tete;
   }
 
+  // writeRepertoire(NULL,tete);
+
   return p;
 }
 
-PERSONNE * ajoutPersonneFin(PERSONNE * tete, PERSONNE * p){
+NOEUD * ajoutPersonneFin(NOEUD * tete, NOEUD * p){
   if(tete == NULL){
     tete = p;
   }
   else{
-    PERSONNE * courant = tete;
+    NOEUD * courant = tete;
     while(courant->suiv != NULL){
       courant = courant->suiv;
     }
     courant->suiv = p;
   }
+
+  // writeRepertoire(NULL,tete);
+
   return tete;
 }
 
-PERSONNE * ajoutPersonneParNom(PERSONNE * tete, PERSONNE * p){
+NOEUD * ajoutPersonneParNom(NOEUD * tete, NOEUD * p){
   if(tete == NULL){
     tete = p;
   }
   else{
-    PERSONNE * precedant = tete;
-    PERSONNE * courant = tete->suiv;
+    NOEUD * precedant = tete;
+    NOEUD * courant = tete->suiv;
 
     if(courant == NULL){ //true quand il n'y a qu'un element dans la liste tete
-      if(strcmp(precedant->nom,p->nom)<0){
+      if(strcmp(precedant->courant->nom,p->courant->nom)<0){
         tete = ajoutPersonneFin(precedant,p);
       }
       else{
@@ -48,12 +55,12 @@ PERSONNE * ajoutPersonneParNom(PERSONNE * tete, PERSONNE * p){
     }
 
     else{//cas où il y a 2 elem ou plus
-      while(courant->suiv != NULL && strcmp(courant->nom,p->nom) < 0){
+      while(courant->suiv != NULL && strcmp(courant->courant->nom,p->courant->nom) < 0){
         precedant = courant;
         courant = courant->suiv;
       }
 
-      if(strcmp(precedant->nom,p->nom)>0){
+      if(strcmp(precedant->courant->nom,p->courant->nom)>0){
         tete = ajoutPersonne(precedant,p);//Cas où la personne à ajouter est avant la première personne de la liste
       }
       else{
@@ -67,34 +74,48 @@ PERSONNE * ajoutPersonneParNom(PERSONNE * tete, PERSONNE * p){
       }
     }
   }
+
+  // writeRepertoire(NULL,tete);
+
   return tete;
 }
 
-PERSONNE * saisirPersonne(PERSONNE * tete){
+PERSONNE * saisirPersonne(void){
   PERSONNE * p = malloc(sizeof(PERSONNE));
   printf("  Rentrez les informations de la personne\nNom : ");
   scanf("%s", p->nom);
   printf("  Prénom : ");
   scanf("%s", p->prenom);
-  printf("  teléro (0xxxxxxxxx) : ");
+  printf("  Numéro de telephone (0xxxxxxxxx) : ");
   scanf("%s", p->tel);
-
-  p->suiv = NULL;
 
   return p;
 }
 
-PERSONNE * recherchePersonne(PERSONNE * tete, unsigned char mode, char * critere){
-  PERSONNE * courant = tete;
-  PERSONNE * ret = NULL;
+NOEUD * creerNoeud(PERSONNE * personne, NOEUD * suivant){
+  if(personne == NULL) return NULL;
+
+  NOEUD * nouveau = NULL;
+  nouveau = malloc(sizeof(NOEUD));
+  if(nouveau == NULL) return NULL;
+
+  nouveau->courant = personne;
+  nouveau->suiv = suivant; //peut être null;
+
+  return nouveau;
+}
+
+NOEUD * recherchePersonne(NOEUD * tete, unsigned char mode, char * critere){
+  NOEUD * courant = tete;
+  NOEUD * ret = NULL;
 
   if(tete != NULL && critere != NULL && strcmp(critere,"") != 0){
     switch(mode){
       case '1': //Recherche par nom
-        while(courant->suiv != NULL && strcmp(courant->nom,critere) != 0){
+        while(courant->suiv != NULL && strcmp(courant->courant->nom,critere) != 0){
           courant = courant->suiv;
         }
-        if(strcmp(courant->nom,critere) == 0){
+        if(strcmp(courant->courant->nom,critere) == 0){
           ret = courant;
         }
         else{
@@ -103,10 +124,10 @@ PERSONNE * recherchePersonne(PERSONNE * tete, unsigned char mode, char * critere
       break;
 
       case '2': //Recherche par prenom
-        while(courant->suiv != NULL && strcmp(courant->prenom,critere) != 0){
+        while(courant->suiv != NULL && strcmp(courant->courant->prenom,critere) != 0){
           courant = courant->suiv;
         }
-        if(strcmp(courant->prenom,critere) == 0){
+        if(strcmp(courant->courant->prenom,critere) == 0){
           ret = courant;
         }
         else{
@@ -115,10 +136,10 @@ PERSONNE * recherchePersonne(PERSONNE * tete, unsigned char mode, char * critere
       break;
 
       case '3': //Recherche par numero de telephone
-        while(courant->suiv != NULL && strcmp(courant->tel,critere) != 0){
+        while(courant->suiv != NULL && strcmp(courant->courant->tel,critere) != 0){
           courant = courant->suiv;
         }
-        if(strcmp(courant->tel,critere) == 0){
+        if(strcmp(courant->courant->tel,critere) == 0){
           ret = courant;
         }
         else{
@@ -139,15 +160,16 @@ PERSONNE * recherchePersonne(PERSONNE * tete, unsigned char mode, char * critere
   return ret; //SI retun NULL : un erreur est survenue ; Sinon retour la personne cherchée
 }
 
-PERSONNE * supprimePersonne(PERSONNE * tete, PERSONNE * p){
+NOEUD * supprimePersonne(NOEUD * tete, NOEUD * p){
   if(tete == NULL){return NULL;}
   if(p==NULL){return NULL;}
-  PERSONNE * precedant = tete;
-  PERSONNE * courant = precedant->suiv;
+  NOEUD * precedant = tete;
+  NOEUD * courant = precedant->suiv;
 
   if(precedant == p){
     //suppression du premier
     tete = courant;
+    free(precedant->courant);
     free(precedant);
     return tete;
   }
@@ -162,6 +184,7 @@ PERSONNE * supprimePersonne(PERSONNE * tete, PERSONNE * p){
       if(courant == p){
         //suppression du dernier
         precedant->suiv = NULL;
+        free(courant->courant);
         free(courant);
       }
 
@@ -174,6 +197,7 @@ PERSONNE * supprimePersonne(PERSONNE * tete, PERSONNE * p){
     else if(courant == p){
       //cas nominal
       precedant->suiv = courant->suiv;
+      free(courant->courant);
       free(courant);
     }
     else{

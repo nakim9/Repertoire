@@ -6,13 +6,16 @@ GTKFA= `pkg-config --libs gtk+-3.0`
 
 all : $(EXE) clean
 
-repertoire: vue.o modele.o main.o
+repertoire: vue.o modele.o listio.o main.o
 	$(CC) -o $@ $^
 
 vue.o: vue.c
 	$(CC) -o $@ -c $< $(FLAGS)
 
 modele.o: modele.c
+	$(CC) -o $@ -c $< $(FLAGS)
+
+listio.o: listio.c
 	$(CC) -o $@ -c $< $(FLAGS)
 
 main.o: main.c

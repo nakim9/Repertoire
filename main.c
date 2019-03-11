@@ -7,25 +7,13 @@
 #include "struct.h"
 #include "modele.h"
 #include "vue.h"
+#include "listio.h"
 
+#define UTF8(string) g_locale_to_utf8(string, -1, NULL, NULL, NULL)
 
-
-
-// int main(int argc, char **argv)
-//
-// {
-//
-//     /* Initialisation de GTK+ */
-//
-//     gtk_init(&argc, &argv);
-//
-//     return EXIT_SUCCESS;
-//
-// }
-
-
-void menu();
-PERSONNE * seekAndDestroy(PERSONNE * tete);
+int menu();
+NOEUD * seekAndDestroy(NOEUD * tete);
+NOEUD * ajoutTrio(NOEUD * tete);
 
 int main(void){
 
@@ -37,32 +25,10 @@ int main(void){
   return 0;
 }
 
-void menu(){
+int menu(){
   int choixMenu;
-  PERSONNE * tete = NULL;
-
-  /* Ajout en dur de 3 personnes */
-  PERSONNE * premier = malloc(sizeof(PERSONNE));
-  strcpy(premier->nom,"Greck");
-  strcpy(premier->prenom,"Lucas");
-  strcpy(premier->tel,"0123456789");
-  premier->suiv = NULL;
-
-  PERSONNE * deuxieme = malloc(sizeof(PERSONNE));
-  strcpy(deuxieme->nom,"Gonckel");
-  strcpy(deuxieme->prenom,"Laury");
-  strcpy(deuxieme->tel,"0658536831");
-  deuxieme->suiv = NULL;
-
-  PERSONNE * troisieme = malloc(sizeof(PERSONNE));
-  strcpy(troisieme->nom,"Robin");
-  strcpy(troisieme->prenom,"Tangui");
-  strcpy(troisieme->tel,"0761986318");
-  troisieme->suiv = NULL;
-
-  tete = ajoutPersonneParNom(tete,premier);
-  tete = ajoutPersonneParNom(tete,deuxieme);
-  tete = ajoutPersonneParNom(tete,troisieme);
+  NOEUD * tete = NULL;
+  tete = readRepertoire(NULL);
 
 
   do{
@@ -78,41 +44,49 @@ void menu(){
       printf(" Entrée invalide. Veuillez selectionner une des options proposées\n ->");
       scanf("%d",&choixMenu);
     }
-    PERSONNE * nouveau = NULL;
+    NOEUD * nouveau = NULL;
     switch (choixMenu) {
       case 1:
       affichePersonnes(tete);
       break;
 
       case 2:
-      nouveau = saisirPersonne(tete);
+      nouveau = creerNoeud(saisirPersonne(),NULL);
       tete = ajoutPersonne(tete,nouveau);
       break;
 
       case 3:
-      nouveau = saisirPersonne(tete);
+      nouveau = creerNoeud(saisirPersonne(),NULL);
       tete = ajoutPersonneFin(tete,nouveau);
       break;
 
       case 4:
-      nouveau = saisirPersonne(tete);
+      nouveau = creerNoeud(saisirPersonne(),NULL);
       tete = ajoutPersonneParNom(tete,nouveau);
       break;
 
       case 5:
       tete = seekAndDestroy(tete);
       break;
+
+      case 10:
+      tete = ajoutTrio(tete);
+      break;
     }
   }while(choixMenu != 0);
+
+  writeRepertoire(NULL,tete);
 
   while (tete != NULL) {
     tete = supprimePersonne(tete,tete);
   }
+
+  return 0;
 }
 
-PERSONNE * seekAndDestroy(PERSONNE * tete){
-  PERSONNE * pRecherche = NULL;
-unsigned char modeRecherche=0; char recherche[32]; char reponseForm = 'a';
+NOEUD * seekAndDestroy(NOEUD * tete){
+  NOEUD * pRecherche = NULL;
+  unsigned char modeRecherche=0; char recherche[32]; char reponseForm = 'a';
   /* Formulaire pour la recherche */
     /* Mode */
   do{
@@ -136,7 +110,7 @@ unsigned char modeRecherche=0; char recherche[32]; char reponseForm = 'a';
   /* Formulaire de suppression */
   if(pRecherche != NULL){
     printf("    Cette personne a été trouvée !\n");
-    affichePersonne(pRecherche);
+    affichePersonne(pRecherche->courant);
 
     do{
       printf("    Voulez vous la supprimer ? (o/n)\n   --> ");
@@ -151,6 +125,55 @@ unsigned char modeRecherche=0; char recherche[32]; char reponseForm = 'a';
     }
 
   }
+
+  return tete;
+}
+
+
+NOEUD * ajoutTrio(NOEUD * tete){
+  /* Ajout en dur de 3 personnes */
+  PERSONNE * premier = NULL;
+  premier = malloc(sizeof(PERSONNE));
+  if(premier == NULL) return NULL;
+
+  strcpy(premier->nom,"Greck");
+  strcpy(premier->prenom,"Lucas");
+  strcpy(premier->tel,"0123456789");
+
+  NOEUD * n1 = NULL;
+  n1 = malloc(sizeof(NOEUD));
+  if(n1 == NULL) return NULL;
+  n1->courant = premier;
+
+  PERSONNE * deuxieme = NULL;
+  deuxieme = malloc(sizeof(PERSONNE));
+  if(deuxieme == NULL) return NULL;
+
+  strcpy(deuxieme->nom,"Gonckel");
+  strcpy(deuxieme->prenom,"Laury");
+  strcpy(deuxieme->tel,"0658536831");
+
+  NOEUD * n2 = NULL;
+  n2 = malloc(sizeof(NOEUD));
+  if(n2 == NULL) return NULL;
+  n2->courant = deuxieme;
+
+  PERSONNE * troisieme = NULL;
+  troisieme = malloc(sizeof(PERSONNE));
+  if(troisieme == NULL) return NULL;
+
+  strcpy(troisieme->nom,"Robin");
+  strcpy(troisieme->prenom,"Tangui");
+  strcpy(troisieme->tel,"0761986318");
+
+  NOEUD * n3 = NULL;
+  n3 = malloc(sizeof(NOEUD));
+  if(n3 == NULL) return NULL;
+  n3->courant = troisieme;
+
+  tete = ajoutPersonneParNom(tete,n1);
+  tete = ajoutPersonneParNom(tete,n2);
+  tete = ajoutPersonneParNom(tete,n3);
 
   return tete;
 }

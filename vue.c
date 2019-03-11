@@ -10,10 +10,10 @@ void affichePersonne(PERSONNE * p){
   }
 }
 
-void affichePersonnes(PERSONNE * p){
+void affichePersonnes(NOEUD * p){
   if(p == NULL) printf("L'annuaire est vide\n"); //Affichage si le paramettre  est vide
   while(p != NULL){
-    affichePersonne(p);
+    affichePersonne(p->courant);
     p = p->suiv;
   }
 }

@@ -1,15 +1,20 @@
 /* ajoute au repertoire une personne p dans la liste tete */
-PERSONNE * ajoutPersonne(PERSONNE * tete, PERSONNE * p);
+NOEUD * ajoutPersonne(NOEUD * tete, NOEUD * p);
 
 /* ajoute la personne p à la fin de la liste chainée */
-PERSONNE * ajoutPersonneFin(PERSONNE * tete, PERSONNE * p);
+NOEUD * ajoutPersonneFin(NOEUD * tete, NOEUD * p);
 
 /* ajoute au repertoire la personne p par ordre de nom alphabétique*/
-PERSONNE * ajoutPersonneParNom(PERSONNE * tete, PERSONNE * p);
+NOEUD * ajoutPersonneParNom(NOEUD * tete, NOEUD * p);
 
-
-/* Demande à l'utilisateur d'ajouter une personne au repertoire et l'ajoute*/
-PERSONNE * saisirPersonne(PERSONNE * tete);
+/* Demande à l'utilisateur de saisir une personne à ajouter au repertoire */
+PERSONNE * saisirPersonne(void);
+/*  Permet de créer un noeud
+  *personne : personne associé au noeud
+  *suivant : noeud suivant, peut être null
+  * /!\ Methode unsafe : merci de verifier le retour de la fonction
+*/
+NOEUD * creerNoeud(PERSONNE * personne, NOEUD * suivant);
 
 /**
   *Permet de chercher parmis la liste chainée designée par tete selon le mode
@@ -19,7 +24,7 @@ PERSONNE * saisirPersonne(PERSONNE * tete);
   *   3 : Recherche par numero de téléphone
   *critere est ce que l'on cherche
 */
-PERSONNE * recherchePersonne(PERSONNE * tete, unsigned char mode, char * critere);
+NOEUD * recherchePersonne(NOEUD * tete, unsigned char mode, char * critere);
 
 /* Supprime l'element de la liste */
-PERSONNE * supprimePersonne(PERSONNE * tete, PERSONNE * p);
+NOEUD * supprimePersonne(NOEUD * tete, NOEUD * p);
